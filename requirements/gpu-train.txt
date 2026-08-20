@@ -1,0 +1,6 @@
+# Install only on the frozen Linux/CUDA GPU image after Phase 4 smoke testing.
+transformers
+peft
+trl
+bitsandbytes
+

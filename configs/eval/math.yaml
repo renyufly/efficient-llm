@@ -1,0 +1,5 @@
+schema_version: 1
+run: {name: eval-math, seed: 42, output_dir: "results/raw/${run.name}", overwrite: false}
+model: {id: Qwen/Qwen3-1.7B-Base, revision: main, dtype: bfloat16}
+data: {manifest: data/manifests/gsm8k.json, split: test_500}
+generation: {do_sample: false, max_new_tokens: 256, ignore_eos: false}

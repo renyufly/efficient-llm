@@ -1,0 +1,4 @@
+schema_version: 1
+run: {name: serve-hf, seed: 42, output_dir: "results/raw/${run.name}", overwrite: false}
+model: {canonical_manifest: artifacts/canonical.json, revision: main, dtype: bfloat16}
+server: {host: 127.0.0.1, port: 8000}

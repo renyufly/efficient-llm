@@ -1,0 +1,5 @@
+schema_version: 1
+run: {name: quantize-int4, seed: 42, output_dir: artifacts/quantized/int4, overwrite: false}
+model: {canonical_manifest: artifacts/canonical.json, revision: main}
+quantization: {preferred: gptq, fallback: awq, bits: 4, activation_dtype: float16, kernel: marlin}
+
