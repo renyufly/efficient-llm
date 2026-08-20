@@ -559,10 +559,10 @@ GPU：
 
 ## 10.1 Attention
 
-理解：
+理解：Attention(Q,K,V)
 
-# $$ Attention(Q,K,V)
-
+$$ 
+Attention(Q,K,V)
 softmax\left(
 \frac{QK^T}{\sqrt{d_k}}
 \right)V
