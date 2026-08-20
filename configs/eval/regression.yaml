@@ -1,0 +1,5 @@
+schema_version: 1
+run: {name: eval-regression, seed: 42, output_dir: "results/raw/${run.name}", overwrite: false}
+model: {id: Qwen/Qwen3-1.7B-Base, revision: main, dtype: bfloat16}
+datasets: [{id: allenai/ai2_arc, split: test, limit: 200}, {id: Rowan/hellaswag, split: validation, limit: 200}]
+scoring: zero_shot_log_likelihood

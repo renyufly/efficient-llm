@@ -1,0 +1,5 @@
+schema_version: 1
+run: {name: prepare-gsm8k, seed: 2026, output_dir: data/processed/gsm8k, overwrite: false}
+dataset: {id: openai/gsm8k, config: main, revision: main, data_seed: 2026}
+tokenizer: {id: Qwen/Qwen3-1.7B-Base, revision: main}
+max_seq_length: 512

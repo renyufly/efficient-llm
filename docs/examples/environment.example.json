@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "collected_at_utc": "2026-08-20T00:00:00+00:00",
+  "os": {"system": "Windows", "release": "example", "version": "example"},
+  "python": {"version": "3.11.14", "executable": ".venv/Scripts/python.exe"},
+  "git": {"commit": "<git-commit>", "dirty": false},
+  "cpu": {"logical_count": 0, "physical_count": 0, "processor": "example"},
+  "ram": {"total_bytes": 0, "available_bytes": 0},
+  "disk": {"path": "<project-disk>", "total_bytes": 0, "free_bytes": 0},
+  "gpu": {"available": false, "reason": "nvidia-smi not found"}
+}

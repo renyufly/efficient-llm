@@ -1,0 +1,13 @@
+schema_version: 1
+run:
+  name: base
+  seed: 42
+  output_dir: artifacts/runs/${run.name}
+  overwrite: false
+model:
+  id: Qwen/Qwen3-1.7B-Base
+  revision: main
+  trust_remote_code: false
+  dtype: bfloat16
+  attn_implementation: sdpa
+

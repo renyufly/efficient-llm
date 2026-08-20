@@ -1,0 +1,23 @@
+.venv/
+.tools/
+.cache/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Append-only experiment inputs and outputs are local by default.
+data/raw/
+data/processed/
+artifacts/**
+!artifacts/.gitkeep
+results/raw/**
+results/predictions/**
+results/summaries/**
+results/figures/**
+!results/**/.gitkeep
+

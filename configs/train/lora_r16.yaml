@@ -1,0 +1,6 @@
+schema_version: 1
+run: {name: lora-r16-seed42, seed: 42, output_dir: "artifacts/runs/${run.name}", overwrite: false}
+model: {id: Qwen/Qwen3-1.7B-Base, revision: main, dtype: bfloat16}
+data: {manifest: data/manifests/gsm8k.json, max_seq_length: 512, packing: false}
+training: {method: lora, epochs: 3, learning_rate: 0.0002, micro_batch_size: 1, gradient_accumulation_steps: 32, effective_batch_size: 32, world_size: 1, optimizer: paged_adamw_8bit, scheduler: cosine, warmup_ratio: 0.03, gradient_checkpointing: true}
+lora: {rank: 16, alpha: 32, dropout: 0.05, bias: none, target_modules: all-linear, exclude_modules: [embed_tokens, lm_head]}

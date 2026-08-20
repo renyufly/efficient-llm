@@ -1,0 +1,3 @@
+# Keep uv's cache and managed Python installations inside this repository.
+cache-dir = ".cache/uv"
+python-preference = "managed"
