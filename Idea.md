@@ -312,10 +312,10 @@ lm-evaluation-harness
 性能分析：
 
 ```text
-PyTorch profiler
 nvidia-smi
 
-后续 Bonus：
+Core 完整版 / 后续：
+PyTorch Profiler
 Nsight Systems
 Nsight Compute
 ```
@@ -326,7 +326,7 @@ Nsight Compute
 JSON / CSV
 TensorBoard
 
-可选：
+Core MVP 之后可选：
 Weights & Biases
 ```
 
@@ -412,15 +412,15 @@ Quantization Test
 
 ## 7.3 低价单卡 GPU
 
-免费 GPU 无法满足实验时才租：
+本项目正式 GPU 已选择：
 
 ```text
-T4 16GB
-L4 24GB
-A10 24GB
-RTX 3090 24GB
 RTX 4090 24GB
 ```
+
+租用参考价格为约 2 元人民币/小时。A10 24GB 的参考价格约为 3.5 元人民币/小时；在显存容量相同的情况下，RTX 4090 对本项目具有更高的性价比，因此不再将 A10 作为首选正式平台。
+
+可使用免费 L4 / T4 完成本地流程迁移或 Smoke Test，但所有正式训练显存、量化和推理性能结论统一来自 RTX 4090。
 
 原则：
 
@@ -452,16 +452,20 @@ Shutdown GPU
 
 GPU 预算优先保持较低，但不再预先设置不可调整的绝对硬上限。先通过 Smoke Test 和 Token 统计估算，再根据核心实验需要调整。
 
-硬件优先级：
+正式硬件配置：
 
 ```text
-1. 免费 L4
-2. 低价租用 L4 / A10 / RTX 3090
-3. 免费 T4
-4. RTX 4090
+GPU：RTX 4090 24GB
+CPU Memory：48GB DDR4
+Storage：50GB System Disk + 200GB SSD
+Reference Price：约 2 CNY / GPU Hour
 ```
 
-所有正式性能结论必须来自同一型号、同一张 GPU。T4 可以用于跑通流程，但没有合适的原生 BF16 性能支持；若最终只能使用 T4，训练计算精度改为 FP16，并在报告中明确标注，不能仍称为 BF16。
+RTX 4090 支持本项目所需的 BF16、bitsandbytes NF4、AWQ/GPTQ/Marlin 和 vLLM。所有正式性能结论必须来自同一型号 GPU；优先在同一个实例租用周期内集中完成正式 Benchmark，并记录 GPU UUID、Power Limit、Driver、CUDA 和软件环境。
+
+48GB CPU 内存足够完成 1.7B 模型的数据处理、Adapter Merge、量化和评测。50GB 系统盘只用于操作系统和基础环境；Hugging Face Cache、PyTorch Cache、pip Cache、Docker Data、训练 Checkpoint、Merged Model、量化模型和结果必须放到 200GB SSD，避免系统盘被缓存占满。
+
+租用前必须确认：完整独占 24GB GPU、无其他用户进程、无异常低功率限制、Linux 环境、200GB SSD 在实验期间持久可用，以及可以访问 Hugging Face。硬件确认只冻结实验方案，不代表立即租用、启动实例或产生费用；只有收到明确的执行指令后才进入云 GPU 阶段。
 
 计划：
 
@@ -1045,11 +1049,11 @@ INT4
 ```text
 QLoRA Training：bitsandbytes NF4
 Baseline Inference：BF16（硬件不支持时明确改为 FP16）
-Deployment INT4：AWQ 或 GPTQ/W4A16 二选一
+Deployment INT4：优先 GPTQ/W4A16 + Marlin，AWQ 作为兼容性回退
 Optional：bitsandbytes INT8
 ```
 
-AWQ 与 GPTQ/W4A16 的选择推迟到最终 GPU 确认和小型兼容性验证之后。第一版只选择一种部署 INT4，不同时堆叠多个量化格式。
+RTX 4090 已确认。部署 INT4 的默认路线为 GPTQ/W4A16 + Marlin；进入量化阶段时先执行小型兼容性验证，如果目标模型、工具版本或 vLLM 后端存在阻塞，再回退到 AWQ。该切换由兼容性证据决定，不需要提前扩大为两套完整实验。第一版只正式评测一种部署 INT4，不同时堆叠多个量化格式。
 
 量化对象是根据 Validation 选出的最佳微调方法：先将其 Adapter Merge 到 Base，得到唯一的浮点 checkpoint，再由同一个 checkpoint 生成部署 INT4。这样 BF16/FP16 与 INT4 对照只改变量化方式。
 
@@ -2785,7 +2789,23 @@ GPU 预算按实际 Smoke Test 结果调整，优先级依次为：
 4. 核心实验复跑
 5. Rank 32、INT8 和更多长度点
 
-## 34.2 默认训练协议
+## 34.2 已确认硬件
+
+```text
+GPU：RTX 4090 24GB
+Rental Price：约 2 CNY / GPU Hour
+CPU Memory：48GB DDR4
+System Disk：50GB
+Data SSD：200GB
+```
+
+选择 RTX 4090 而不是约 3.5 元/小时的 A10 24GB，原因是两者显存容量相同，而 4090 在当前租价下具有更高的训练与推理性价比。正式 LoRA/QLoRA 显存测量、BF16 vs INT4、HF vs vLLM 及全部并发 Benchmark 均在 RTX 4090 上完成。
+
+所有模型缓存、Docker Data、Checkpoint、Merged/Quantized Model 和结果写入 200GB SSD，不依赖 50GB 系统盘。正式实验前检查 GPU 独占性、Power Limit、Driver/CUDA、磁盘持久性和网络访问，并记录完整环境元数据。
+
+硬件选择只代表方案冻结，不授权自动租用或启动实例。云 GPU 资源只有在收到明确执行指令后才会创建和计费。
+
+## 34.3 默认训练协议
 
 初始默认值：
 
@@ -2819,7 +2839,7 @@ Micro Batch Size 根据显存调整，并通过 Gradient Accumulation 保持 Eff
 
 Test 和 SVAMP 不参与 checkpoint 或超参数选择。所有配置最多训练 3 Epoch，不为单个配置追加额外 Epoch。
 
-## 34.3 LoRA / QLoRA 公平性
+## 34.4 LoRA / QLoRA 公平性
 
 LoRA 与 QLoRA 必须保持一致：
 
@@ -2839,7 +2859,7 @@ LoRA 与 QLoRA 必须保持一致：
 
 Adapter 未 Merge 和 Merge 后各进行一次一致性检查，确认同一输入下输出与评测结果不存在非预期偏差。
 
-## 34.4 质量评测协议
+## 34.5 质量评测协议
 
 主任务：GSM8K；OOD：SVAMP；回归集：ARC-Easy + HellaSwag。
 
@@ -2856,7 +2876,7 @@ Max New Tokens: 256
 
 最终报告同时包含 Bootstrap 95% CI 和核心实验两个训练 Seed 的结果差异，明确二者代表不同的不确定性来源。
 
-## 34.5 性能评测协议
+## 34.6 性能评测协议
 
 质量评测与性能评测严格分离。性能评测使用固定 Token Workload、关闭 Sampling，并忽略 EOS 以保证输出长度一致。
 
@@ -2877,7 +2897,7 @@ Core 完整版再增加 Input 128/1024、Output 32、Request Rate/RPS、P99 和�
 
 所有正式性能数据必须在同一张、同型号 GPU 上获得，并记录 GPU 型号、Driver、CUDA、PyTorch、Transformers、bitsandbytes、vLLM 和量化工具版本。
 
-## 34.6 公开产物
+## 34.7 公开产物
 
 计划公开：
 
@@ -2892,7 +2912,7 @@ Core 完整版再增加 Input 128/1024、Output 32、Request Rate/RPS、P99 和�
 
 原始 Qwen Base 不重复上传。BF16 Merged Checkpoint 默认不重复上传，因为可以由公开 Base 与 Adapter 重建。
 
-## 34.7 明确推迟到 Core MVP 之后的项目
+## 34.8 明确推迟到 Core MVP 之后的项目
 
 ```text
 LoRA Rank 32
@@ -2905,3 +2925,18 @@ GSM-Symbolic
 其他模型系列
 Bonus Track
 ```
+
+## 34.9 执行就绪状态
+
+当前 Core MVP 的项目目标、模型、数据集、数据切分、训练协议、质量评测、硬件、量化候选路线和性能 Benchmark 均已冻结，可以进入执行层面。
+
+以下事项不阻塞启动：
+
+- 最终 `max_seq_length` 由 Token 长度统计按既定 5% 规则决定
+- Micro Batch Size 和 Gradient Accumulation 由 RTX 4090 Smoke Test 决定，但 Effective Batch Size 固定为 32
+- Sequence Packing 仅在正确性验证通过后统一启用
+- GPTQ/W4A16 + Marlin 若兼容性失败则按既定规则回退 AWQ
+- 公开产物的具体 Hugging Face / GitHub 发布位置在发布阶段确定
+- Rank 32、INT8、Profiler 和其他扩展均在 Core MVP 完成后重新评估
+
+进入执行层面不代表立即租用 GPU。先完成本地 Phase 0、数据准备、Tokenizer 长度分析、评测脚本和 CPU Smoke Test；只有本地流程通过且收到明确指令后，才启动付费 RTX 4090 实例。
